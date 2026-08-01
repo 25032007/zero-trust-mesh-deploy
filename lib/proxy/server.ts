@@ -3,17 +3,18 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { createServer } from 'http';
 import { WebSocketServer } from 'ws';
-import { identityMiddleware } from './identity/middleware';
-import { tokenValidationMiddleware } from './token/validation';
-import { policyEngine } from './policies/engine';
-import { riskEngine } from './risk/engine';
-import { anomalyEngine } from './anomaly/engine';
-import { lateralMovementDetector } from './detection/lateral-movement';
-import { auditLogger } from './audit/logger';
-import { rateLimiter } from './rate-limiting/limiter';
-import { quarantineService } from './quarantine/service';
-import { metricsCollector } from './metrics/collector';
-import { wsEventBroadcaster } from './websocket/broadcaster';
+import { identityMiddleware } from '../identity/middleware';
+import { identityService } from '../identity/service';
+import { tokenValidationMiddleware } from '../token/validation';
+import { policyEngine } from '../policies/engine';
+import { riskEngine } from '../risk/engine';
+import { anomalyEngine } from '../anomaly/engine';
+import { lateralMovementDetector } from '../detection/lateral-movement';
+import { auditLogger } from '../audit/logger';
+import { rateLimiter } from '../rate-limiting/limiter';
+import { quarantineService } from '../quarantine/service';
+import { metricsCollector } from '../metrics/collector';
+import { wsEventBroadcaster } from '../websocket/broadcaster';
 
 dotenv.config();
 
@@ -115,7 +116,7 @@ app.use(
       }
 
       // Calculate payload anomaly
-      const payloadAnomaly = await anomalyEngine.detectPayloadAnomaly(req.body);
+      const payloadAnomaly = await anomalyEngine.detectPayloadAnomaly(req.body, endpoint);
 
       // Calculate risk score
       const riskScore = await riskEngine.calculateRisk({
@@ -124,6 +125,7 @@ app.use(
         endpoint,
         method,
         payloadAnomaly,
+        ip: req.ip || req.socket.remoteAddress,
         context: (req as any).context,
       });
 
@@ -174,19 +176,29 @@ app.use(
 
       // Dynamic re-authentication if risk is high
       if (riskScore > 60 && riskScore <= 75) {
-        await auditLogger.log({
-          action: 'STEP_UP_AUTH_REQUIRED',
-          source,
-          riskScore,
-        });
+        const mfaToken = req.headers['x-service-totp'] as string;
+        if (mfaToken && identityService.verifyMfa(source, mfaToken)) {
+          // MFA successful, allow request
+          await auditLogger.log({
+            action: 'MFA_SUCCESS',
+            source,
+            riskScore,
+          });
+        } else {
+          await auditLogger.log({
+            action: 'STEP_UP_AUTH_REQUIRED',
+            source,
+            riskScore,
+          });
 
-        return res.status(401).json({
-          decision: 'STEP_UP_AUTH',
-          reason: 'HIGH_RISK_DETECTED',
-          riskScore,
-          message: 'Step-up authentication required',
-          requiresReauth: true,
-        });
+          return res.status(401).json({
+            decision: 'STEP_UP_AUTH',
+            reason: 'HIGH_RISK_DETECTED',
+            riskScore,
+            message: 'Step-up authentication (MFA) required',
+            requiresReauth: true,
+          });
+        }
       }
 
       if (riskScore > 75) {

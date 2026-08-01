@@ -1,4 +1,5 @@
 import redis from 'redis';
+import geoip from 'geoip-lite';
 
 interface RiskContext {
   source: string;
@@ -6,6 +7,7 @@ interface RiskContext {
   endpoint: string;
   method: string;
   payloadAnomaly?: number;
+  ip?: string;
   context: any;
 }
 
@@ -116,7 +118,26 @@ class RiskEngine {
    * Check for geo anomaly (placeholder - would use IP geolocation in production)
    */
   private checkGeoAnomaly(context: RiskContext): number {
-    // In production, would use IP geolocation and compare to historical data
+    if (!context.ip) return 0;
+    
+    // For local testing
+    if (context.ip === '127.0.0.1' || context.ip === '::1' || context.ip.includes('localhost')) {
+      return 0;
+    }
+
+    const geo = geoip.lookup(context.ip);
+    if (!geo) return 5; // Unknown IP location has slight risk
+
+    const highRiskCountries = ['KP', 'SY', 'IR', 'CU'];
+    if (highRiskCountries.includes(geo.country)) {
+      return 30; // High risk country
+    }
+
+    const normalRegions = ['US', 'GB', 'DE', 'FR', 'CA', 'AU', 'IN'];
+    if (!normalRegions.includes(geo.country)) {
+      return 15; // Unexpected region
+    }
+
     return 0;
   }
 

@@ -1,0 +1,41 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: ext-authz
+  namespace: default
+spec:
+  workloadSelector:
+    labels:
+      app: zero-trust-proxy
+  configPatches:
+  - applyTo: HTTP_FILTER
+    match:
+      context: SIDECAR_INBOUND
+      listener:
+        filterChain:
+          filter:
+            name: "envoy.filters.network.http_connection_manager"
+            subFilter:
+              name: "envoy.filters.http.router"
+    patch:
+      operation: INSERT_BEFORE
+      value:
+        name: envoy.filters.http.ext_authz
+        typed_config:
+          "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz
+          http_service:
+            server_uri:
+              uri: http://zero-trust-proxy.default.svc.cluster.local:4000
+              cluster: outbound|4000||zero-trust-proxy.default.svc.cluster.local
+              timeout: 0.25s
+            authorization_request:
+              allowed_headers:
+                patterns:
+                - exact: "authorization"
+                - exact: "x-service-id"
+                - exact: "x-destination-service"
+                - exact: "x-service-totp"
+            authorization_response:
+              allowed_client_headers:
+                patterns:
+                - exact: "x-risk-score"

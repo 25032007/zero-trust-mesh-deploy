@@ -13,4 +13,9 @@ router.get('/security', (req, res) => {
   res.json({ events, count: events.length });
 });
 
+router.get('/compliance', (req, res) => {
+  const report = auditLogger.generateComplianceReport();
+  res.json(report);
+});
+
 export default router;

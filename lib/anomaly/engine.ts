@@ -22,21 +22,21 @@ class AnomalyEngine {
   /**
    * Detect payload anomalies
    */
-  async detectPayloadAnomaly(payload: any): Promise<number> {
+  async detectPayloadAnomaly(payload: any, endpoint?: string): Promise<number> {
     if (!payload || typeof payload !== 'object') {
       return 0; // No payload to analyze
     }
 
-    const anomalyScore = this.analyzePayload(payload);
+    const anomalyScore = this.analyzePayload(payload, endpoint);
     return Math.min(100, Math.max(0, anomalyScore.score));
   }
 
   /**
    * Analyze payload for anomalies
    */
-  private analyzePayload(payload: any): AnomalyScore {
+  private analyzePayload(payload: any, endpoint?: string): AnomalyScore {
     const factors = {
-      sizeAnomaly: this.checkSizeAnomaly(payload),
+      sizeAnomaly: this.checkSizeAnomaly(payload, endpoint),
       structureAnomaly: this.checkStructureAnomaly(payload),
       fieldAnomaly: this.checkFieldAnomaly(payload),
       typeAnomaly: this.checkTypeAnomaly(payload),
@@ -68,21 +68,28 @@ class AnomalyEngine {
   /**
    * Check for size anomalies
    */
-  private checkSizeAnomaly(payload: any): number {
+  private checkSizeAnomaly(payload: any, endpoint?: string): number {
     const payloadStr = JSON.stringify(payload);
     const size = payloadStr.length;
 
-    // Warn if payload is unusually large (> 1MB)
-    if (size > 1000000) {
-      return 30;
+    if (endpoint) {
+      this.recordNormalPayload(endpoint, payload); // ML feedback loop
+      const stats = this.getBaselineStats(endpoint);
+      if (stats && stats.stdDevSize > 0) {
+        const zScore = Math.abs(size - stats.avgSize) / stats.stdDevSize;
+        if (zScore > 3) return 40; // Highly anomalous
+        if (zScore > 2) return 20; // Anomalous
+        return 0;
+      }
     }
 
-    // Warn if payload is excessively large (> 10MB)
+    // Fallback to static rules for new endpoints
     if (size > 10000000) {
       return 60;
     }
-
-    // Baseline: normal payloads are usually under 10KB
+    if (size > 1000000) {
+      return 30;
+    }
     if (size > 100000) {
       return 15;
     }
@@ -313,18 +320,21 @@ class AnomalyEngine {
     avgSize: number;
     maxSize: number;
     minSize: number;
+    stdDevSize: number;
   } | null {
     const sizes = this.normalPayloadSizes.get(endpoint);
 
-    if (!sizes || sizes.length === 0) {
+    if (!sizes || sizes.length < 5) {
       return null;
     }
 
     const avgSize = sizes.reduce((a, b) => a + b, 0) / sizes.length;
+    const variance = sizes.reduce((a, b) => a + Math.pow(b - avgSize, 2), 0) / sizes.length;
+    const stdDevSize = Math.sqrt(variance);
     const maxSize = Math.max(...sizes);
     const minSize = Math.min(...sizes);
 
-    return { avgSize, maxSize, minSize };
+    return { avgSize, maxSize, minSize, stdDevSize };
   }
 }
 

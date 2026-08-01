@@ -1,6 +1,7 @@
 import { generateKeyPairSync, sign, verify } from 'crypto';
 import { v4 as uuidv4 } from 'uuid';
 import jwt from 'jsonwebtoken';
+import { authenticator } from 'otplib';
 
 interface ServiceIdentity {
   serviceId: string;
@@ -13,6 +14,7 @@ interface ServiceIdentity {
   createdAt: Date;
   expiresAt?: Date;
   keyVersion: number;
+  totpSecret: string;
 }
 
 interface ServiceToken {
@@ -61,6 +63,7 @@ class IdentityService {
       status: 'ACTIVE',
       createdAt: new Date(),
       keyVersion: 1,
+      totpSecret: authenticator.generateSecret(),
     };
 
     this.identities.set(serviceId, identity);
@@ -228,6 +231,27 @@ class IdentityService {
     } catch (error: any) {
       return { valid: false, error: error.message };
     }
+  }
+
+  /**
+   * Verify MFA TOTP token for service
+   */
+  verifyMfa(serviceId: string, token: string): boolean {
+    const identity = this.identities.get(serviceId);
+    if (!identity || !identity.totpSecret) return false;
+    
+    try {
+      return authenticator.verify({ token, secret: identity.totpSecret });
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /**
+   * Get MFA Secret for service (for testing/setup)
+   */
+  getMfaSecret(serviceId: string): string | undefined {
+    return this.identities.get(serviceId)?.totpSecret;
   }
 
   /**

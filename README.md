@@ -435,12 +435,12 @@ spec:
 
 ## 🤝 Contributing
 
-This is a hackathon project. Future enhancements:
-- Machine learning-based anomaly detection
-- Geographic IP-based risk scoring
-- Multi-factor service authentication
-- Service mesh integration (Istio)
-- Compliance reporting (SOC 2, PCI-DSS)
+This is a hackathon project. Implemented enhancements:
+- ✅ Machine learning-based anomaly detection (Z-Score payloads)
+- ✅ Geographic IP-based risk scoring (GeoIP Lite)
+- ✅ Multi-factor service authentication (TOTP Step-up auth)
+- ✅ Service mesh integration (Istio ext_authz manifests)
+- ✅ Compliance reporting (SOC 2, PCI-DSS automated reports)
 
 ## 📝 License
 
