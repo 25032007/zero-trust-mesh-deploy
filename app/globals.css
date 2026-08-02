@@ -173,7 +173,7 @@
     @apply bg-slate-800/40 backdrop-blur-sm border border-slate-700/50 shadow-lg;
   }
   .premium-glow {
-    @apply relative after:absolute after:inset-0 after:rounded-lg after:ring-1 after:ring-inset after:ring-white/10;
+    @apply relative after:absolute after:inset-0 after:rounded-lg after:ring-1 after:ring-inset after:ring-white/10 after:pointer-events-none;
   }
   
   .animate-fade-in {

@@ -26,9 +26,9 @@ export class WebSocketClient {
     }
 
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const host =
-      process.env.NEXT_PUBLIC_PROXY_HOST ||
-      `${window.location.hostname}:${process.env.NEXT_PUBLIC_PROXY_PORT || 4000}`;
+    const proxyHost = process.env.NEXT_PUBLIC_PROXY_HOST || window.location.hostname;
+    const proxyPort = process.env.NEXT_PUBLIC_PROXY_PORT || '4000';
+    const host = `${proxyHost}:${proxyPort}`;
 
     return `${protocol}//${host}`;
   }
