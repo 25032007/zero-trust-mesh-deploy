@@ -9,7 +9,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "init": "node -r ts-node/register scripts/init-services.ts"
+    "init": "node -r ts-node/register scripts/init-services.ts",
+    "generate-report": "ts-node -T -O \"{\\\"module\\\":\\\"commonjs\\\",\\\"moduleResolution\\\":\\\"node\\\"}\" scripts/full-report.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",
