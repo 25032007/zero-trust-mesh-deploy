@@ -18,11 +18,14 @@ class MetricsCollector {
   private proxyBaseline: number = 0; // ms
 
   middleware() {
+    // Capture `this` so it's accessible inside the overridden res.send
+    const collector = this;
+
     return (req: any, res: any, next: any) => {
       const startTime = Date.now();
 
       // Capture original send
-      const originalSend = res.send;
+      const originalSend = res.send.bind(res);
 
       res.send = function (data: any) {
         const duration = Date.now() - startTime;
@@ -33,18 +36,18 @@ class MetricsCollector {
           method: req.method,
           statusCode: res.statusCode,
           duration,
-          proxyOverhead: duration - this.proxyBaseline,
+          proxyOverhead: duration - collector.proxyBaseline,
           riskScore: res.locals.riskScore,
         };
 
-        this.metrics.push(metric);
+        collector.metrics.push(metric);
 
         // Limit size
-        if (this.metrics.length > 10000) {
-          this.metrics = this.metrics.slice(-10000);
+        if (collector.metrics.length > 10000) {
+          collector.metrics = collector.metrics.slice(-10000);
         }
 
-        return originalSend.call(this, data);
+        return originalSend(data);
       };
 
       next();

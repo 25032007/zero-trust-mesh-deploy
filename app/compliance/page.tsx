@@ -5,7 +5,7 @@ export default function CompliancePage() {
   const [report, setReport] = useState<any>(null);
 
   useEffect(() => {
-    fetch('http://localhost:4000/api/audit/compliance')
+    fetch('/api/audit/compliance')
       .then((res) => res.json())
       .then((data) => setReport(data))
       .catch((err) => console.error(err));

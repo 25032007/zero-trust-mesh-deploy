@@ -35,12 +35,23 @@ app.get('/health', (req: Request, res: Response) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
-// Zero-Trust security middleware pipeline
-app.use(metricsCollector.middleware());
-app.use(rateLimiter.middleware());
-app.use(identityMiddleware.validate);
-app.use(tokenValidationMiddleware.validate);
-app.use(
+// Management API routes — mounted BEFORE security middleware (no auth required)
+// These are internal/admin routes called server-side, not by external services
+app.use('/api/health', require('./routes/health').default);
+app.use('/api/metrics', require('./routes/metrics').default);
+app.use('/api/audit', require('./routes/audit').default);
+app.use('/api/services', require('./routes/services').default);
+app.use('/api/policies', require('./routes/policies').default);
+app.use('/api/tokens', require('./routes/tokens').default);
+app.use('/api/quarantine', require('./routes/quarantine').default);
+app.use('/api/simulator', require('./routes/simulator').default);
+
+// Zero-Trust security middleware pipeline — applies only to /api/proxy
+app.use('/api/proxy', metricsCollector.middleware());
+app.use('/api/proxy', rateLimiter.middleware());
+app.use('/api/proxy', identityMiddleware.validate);
+app.use('/api/proxy', tokenValidationMiddleware.validate);
+app.use('/api/proxy',
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       // Add request context
@@ -80,7 +91,7 @@ app.use(
 );
 
 // Policy and Risk Evaluation Pipeline
-app.use(
+app.use('/api/proxy',
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const source = (req as any).serviceId;
@@ -244,16 +255,8 @@ app.use(
   }
 );
 
-// API Routes
+// Proxy Route (after security pipeline)
 app.use('/api/proxy', require('./routes/proxy').default);
-app.use('/api/health', require('./routes/health').default);
-app.use('/api/metrics', require('./routes/metrics').default);
-app.use('/api/audit', require('./routes/audit').default);
-app.use('/api/services', require('./routes/services').default);
-app.use('/api/policies', require('./routes/policies').default);
-app.use('/api/tokens', require('./routes/tokens').default);
-app.use('/api/quarantine', require('./routes/quarantine').default);
-app.use('/api/simulator', require('./routes/simulator').default);
 
 // Error handling middleware
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
