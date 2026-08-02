@@ -22,6 +22,9 @@ const app = express();
 const httpServer = createServer(app);
 const wss = new WebSocketServer({ server: httpServer });
 
+// Initialize mock services
+identityService.registerMockServices();
+
 // Global middleware
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));

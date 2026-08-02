@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { identityService } from '../lib/identity/service';
+
 
 const SIMULATOR_URL = 'http://localhost:3000/api/simulator/attack';
 const PROXY_URL = 'http://localhost:4000/api/proxy';
@@ -37,22 +37,39 @@ async function runAttackScenario(type: string) {
 }
 
 async function sendProxyRequest() {
-  const token = identityService.createToken('frontend-service', '15m').token;
+  let validToken = '';
   try {
-    const res = await fetch(PROXY_URL + '/some-endpoint', {
-      method: 'GET',
+    const tokenRes = await fetch('http://localhost:4000/api/tokens/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ serviceId: 'frontend-service' }),
+    });
+    const tokenData = await tokenRes.json();
+    validToken = tokenData.token;
+  } catch (error: any) {
+    console.error('Failed to generate valid token:', error.message);
+    return;
+  }
+
+  try {
+    const res = await fetch(PROXY_URL + '/forward', {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        'Authorization': `Bearer ${validToken}`,
         'X-Service-ID': 'frontend-service',
         'X-Destination-Service': 'orders-service',
       },
     });
-    // Consume response to avoid memory leaks
-    await res.text();
-  } catch (error) {
-    // Ignore proxy target fetch errors (if the destination service doesn't actually exist),
-    // the proxy itself will return 500 but still log metrics
+    
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error(`[Load Test Error] Status: ${res.status}, Message: ${errorText}`);
+    } else {
+      await res.text();
+    }
+  } catch (error: any) {
+    console.error(`[Load Test Error] Fetch Failed: ${error.message}`);
   }
 }
 

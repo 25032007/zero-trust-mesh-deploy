@@ -13,7 +13,7 @@ class TokenValidationMiddleware {
   /**
    * Validate incoming service token
    */
-  async validate(req: Request, res: Response, next: NextFunction): Promise<void> {
+  validate = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const authHeader = req.headers.authorization;
 
@@ -59,7 +59,7 @@ class TokenValidationMiddleware {
         await auditLogger.log({
           action: 'TOKEN_VALIDATION_FAILED',
           error: result.error,
-          path: req.path,
+          endpoint: req.path,
           riskScore,
         });
 
@@ -87,6 +87,7 @@ class TokenValidationMiddleware {
 
       next();
     } catch (error: any) {
+      console.error('[TokenValidationMiddleware] Error:', error);
       await auditLogger.log({
         action: 'TOKEN_VALIDATION_ERROR',
         error: error.message,

@@ -87,6 +87,8 @@ class MetricsCollector {
     const overheads = recent.map((m) => m.proxyOverhead).filter((o) => o > 0);
 
     const errors = recent.filter((m) => m.statusCode >= 400).length;
+    const timeSpanMs = recent.length > 1 ? recent[recent.length - 1].timestamp.getTime() - recent[0].timestamp.getTime() : timeWindow;
+    const effectiveWindow = timeSpanMs > 0 ? timeSpanMs : 1000;
 
     return {
       totalRequests: recent.length,
@@ -94,7 +96,7 @@ class MetricsCollector {
       p50Latency: durations[Math.floor(durations.length * 0.5)],
       p95Latency: durations[Math.floor(durations.length * 0.95)],
       p99Latency: durations[Math.floor(durations.length * 0.99)],
-      throughput: Math.round((recent.length / timeWindow) * 60000), // req/min
+      throughput: Math.round((recent.length / effectiveWindow) * 60000), // req/min
       errorRate: Math.round((errors / recent.length) * 100),
       avgProxyOverhead:
         overheads.length > 0

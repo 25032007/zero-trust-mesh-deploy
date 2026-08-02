@@ -6,7 +6,7 @@ import { auditLogger } from '../audit/logger';
  */
 
 class IdentityMiddleware {
-  async validate(req: Request, res: Response, next: NextFunction): Promise<void> {
+  validate = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const serviceIdHeader = req.headers['x-service-id'] as string;
       const serviceNameHeader = req.headers['x-service-name'] as string;
@@ -50,6 +50,7 @@ class IdentityMiddleware {
 
       next();
     } catch (error: any) {
+      console.error('[IdentityMiddleware] Error:', error);
       await auditLogger.log({
         action: 'IDENTITY_VALIDATION_ERROR',
         error: error.message,
