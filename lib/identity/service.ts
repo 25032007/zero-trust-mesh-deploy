@@ -1,7 +1,5 @@
-import { generateKeyPairSync, sign, verify } from 'crypto';
-import { v4 as uuidv4 } from 'uuid';
+import { generateKeyPairSync, sign, verify, randomBytes, randomUUID } from 'crypto';
 import jwt from 'jsonwebtoken';
-import { randomBytes } from 'crypto';
 
 interface ServiceIdentity {
   serviceId: string;
@@ -158,7 +156,7 @@ class IdentityService {
       return { token: '', error: 'SERVICE_INACTIVE' };
     }
 
-    const jti = uuidv4();
+    const jti = randomUUID();
     const payload: ServiceToken = {
       sub: serviceId,
       service_id: serviceId,
