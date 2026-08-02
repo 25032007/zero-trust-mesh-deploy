@@ -15,7 +15,9 @@
 
 <br/>
 
-**[🌍 Live Demo](https://zero-trust-mesh-deploy.vercel.app/)** &nbsp;•&nbsp; **[🐙 GitHub Repository](https://github.com/25032007/zero-trust-mesh-deploy)**
+**[🌍 Live Demo](https://zero-trust-mesh-deploy.vercel.app/)** &nbsp;•&nbsp; **[🐙 GitHub Repository](https://github.com/25032007/zero-trust-mesh-deploy)** 
+&nbsp;•&nbsp;
+**[ Project Drive Link](https://drive.google.com/drive/folders/1BPAGu4OG_4nUdb1iJyD5PcVCwe0gPxAo?usp=sharing)**
 
 <br/>
 
