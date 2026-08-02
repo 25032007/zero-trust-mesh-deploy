@@ -436,7 +436,7 @@ spec:
 ## 🤝 Contributing
 
 This is a hackathon project. Implemented enhancements:
-- ✅ Machine learning-based anomaly detection (Z-Score payloads)
+- ✅ Statistical Z-score anomaly detection (Z-Score payloads)
 - ✅ Geographic IP-based risk scoring (GeoIP Lite)
 - ✅ Multi-factor service authentication (TOTP Step-up auth)
 - ✅ Service mesh integration (Istio ext_authz manifests)
