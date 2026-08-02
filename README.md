@@ -15,7 +15,12 @@
 
 <br/>
 
+**[🌍 Live Demo](https://zero-trust-mesh-deploy.vercel.app/)** &nbsp;•&nbsp; **[🐙 GitHub Repository](https://github.com/25032007/zero-trust-mesh-deploy)**
+
+<br/>
+
 > **Enterprise-grade zero-trust access control platform for microservice security.**  
+> Built for **InnovaHack Chapter 1 (Round 2) - Domain: Cyber Security**.  
 > Every request is independently evaluated through continuous cryptographic verification,  
 > dynamic policy enforcement, and real-time intelligent threat detection.
 
@@ -53,6 +58,12 @@
 ## 🎯 Overview
 
 **Zero-Trust Mesh** implements the *"never trust, always verify"* security model for microservice-to-microservice communication. Unlike traditional perimeter-based security that trusts everything inside the network, every single request — regardless of origin — is independently re-authenticated, re-authorized, and risk-scored in real time.
+
+### 📝 Problem Statement 2: Zero-Trust Access Control for Decentralized APIs
+- **Background:** Enterprise applications run across highly distributed multi-cloud architectures. Traditional perimeter firewalls cannot easily police lateral internal API communication.
+- **The Pain Point:** Once an attacker breaks into one vulnerable edge microservice, they move laterally across internal networks unhindered, scraping backend databases via unsecured APIs.
+- **Core Requirements:** Construct a light dynamic service mesh proxy that enforces cryptographic identity for every single microservice request. Implement contextual policies (time, geo, payload anomalies) that actively re-authenticate endpoints dynamically.
+- **Evaluation Metric:** Proxy overhead latency (<= 15ms), detection rate of lateral movement anomalies, and robustness of dynamic token cryptographic validation.
 
 ### Why Zero Trust?
 
@@ -560,9 +571,15 @@ The proxy integrates with Istio via `ext_authz` — every sidecar delegates auth
 
 ## 🏆 Hackathon Context
 
-**Event:** InnovaHack — Chapter 1  
-**Category:** Cybersecurity / Infrastructure  
-**Team:** Solo  
+**Event:** InnovaHack — Chapter 1 (Round 2)  
+**Domain:** Cyber Security  
+**Problem Statement 2:** Zero-Trust Access Control for Decentralized APIs  
+
+### 👩‍💻 Team: SheBuilds
+| Role | Name |
+|:---|:---|
+| **Team Leader** | Anjali Mulchandani |
+| **Team Member** | Deepika Vala |
 
 ### Key Innovations
 
