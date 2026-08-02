@@ -1,11 +1,18 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
+import { Inter } from 'next/font/google'
 import './globals.css'
 
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+})
+
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
-  generator: 'v0.app',
+  title: 'Zero-Trust Mesh | Security Operations Center',
+  description: 'Enterprise-grade Zero Trust security mesh with continuous identity verification, adaptive access control, and intelligent defense.',
+  generator: 'Zero-Trust Mesh',
   icons: {
     icon: [
       {
@@ -26,10 +33,9 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  colorScheme: 'light dark',
+  colorScheme: 'dark',
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: 'white' },
-    { media: '(prefers-color-scheme: dark)', color: 'black' },
+    { media: '(prefers-color-scheme: dark)', color: '#0a0a0c' },
   ],
 }
 
@@ -39,8 +45,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body className="antialiased">
+    <html lang="en" className={`${inter.variable} dark`}>
+      <body className={`antialiased font-sans ${inter.className}`}>
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
