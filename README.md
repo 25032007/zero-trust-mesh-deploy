@@ -279,8 +279,8 @@ Detects attacker pivoting across the service mesh:
 
 ```bash
 # Clone the repository
-git clone https://github.com/Dipi25368/ZERO-TRUST-MESH.git
-cd ZERO-TRUST-MESH
+git clone https://github.com/25032007/zero-trust-mesh-deploy.git
+cd zero-trust-mesh-deploy
 
 # Install dependencies
 npm install
