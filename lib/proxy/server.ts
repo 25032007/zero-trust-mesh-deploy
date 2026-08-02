@@ -291,8 +291,8 @@ wss.on('connection', (ws) => {
   });
 });
 
-// Start server
-const PORT = process.env.PROXY_PORT || 4000;
+// Start server — Railway injects PORT, local dev uses PROXY_PORT
+const PORT = process.env.PORT || process.env.PROXY_PORT || 4000;
 httpServer.listen(PORT, () => {
   console.log(`[Zero-Trust Proxy] Server listening on port ${PORT}`);
   console.log(`[Health Check] Available at http://localhost:${PORT}/health`);

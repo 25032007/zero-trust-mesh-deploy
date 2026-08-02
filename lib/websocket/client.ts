@@ -25,6 +25,11 @@ export class WebSocketClient {
       return 'ws://localhost:4000';
     }
 
+    // Production override — set NEXT_PUBLIC_WS_URL for Railway/cloud deployments
+    if (process.env.NEXT_PUBLIC_WS_URL) {
+      return process.env.NEXT_PUBLIC_WS_URL;
+    }
+
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const proxyHost = process.env.NEXT_PUBLIC_PROXY_HOST || window.location.hostname;
     const proxyPort = process.env.NEXT_PUBLIC_PROXY_PORT || '4000';

@@ -6,6 +6,7 @@
     "dev": "next dev & node -r ts-node/register scripts/init-services.ts",
     "dev:next": "next dev",
     "dev:proxy": "ts-node -T -O \"{\\\"module\\\":\\\"commonjs\\\",\\\"moduleResolution\\\":\\\"node\\\"}\" lib/proxy/server.ts",
+    "start:proxy": "ts-node -T -O \"{\\\"module\\\":\\\"commonjs\\\",\\\"moduleResolution\\\":\\\"node\\\"}\" lib/proxy/server.ts",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
