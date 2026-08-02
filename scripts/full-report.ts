@@ -42,7 +42,7 @@ async function sendProxyRequest() {
     const tokenRes = await fetch('http://localhost:4000/api/tokens/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ serviceId: 'frontend-service' }),
+      body: JSON.stringify({ serviceId: 'frontend-service', forceRsa: true }),
     });
     const tokenData = await tokenRes.json();
     validToken = tokenData.token;

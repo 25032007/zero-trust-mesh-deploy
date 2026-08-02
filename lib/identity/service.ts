@@ -40,7 +40,7 @@ class IdentityService {
   generateServiceIdentity(
     serviceId: string,
     serviceName: string,
-    algorithm: 'Ed25519' | 'RSA' = 'RSA'
+    algorithm: 'Ed25519' | 'RSA' = 'Ed25519'
   ): ServiceIdentity {
     const { publicKey, privateKey } = generateKeyPairSync(
       algorithm === 'Ed25519' ? 'ed25519' : 'rsa',
